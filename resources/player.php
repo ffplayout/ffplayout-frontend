@@ -1,9 +1,7 @@
 <?php
 
-// get config file
-function get_ini() {
-    return parse_ini_file("/etc/ffplayout/ffplayout.conf", TRUE, INI_SCANNER_RAW);
-}
+require_once('yamlReader.php');
+$yaml = get_yaml();
 
 // file extension to filter
 // for make it nicer
@@ -20,11 +18,10 @@ $ext = implode('|', $except);
 
 // get current track
 if(!empty($_GET['track'])) {
-    $ini = get_ini();
-    $dir = $ini['PLAYLIST']['path'];
+    $dir = $yaml['playlist']['path'];
 
     // list start
-    $start = $ini['PLAYLIST']['day_start'];
+    $start = $yaml['playlist']['day_start'];
     $st = date_parse($start);
     $start_time = $st['hour'] * 3600 + $st['minute'] * 60 + $st['second'];
 

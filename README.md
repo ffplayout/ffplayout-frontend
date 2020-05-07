@@ -36,6 +36,7 @@ Installation:
 ----
 - ffplayout should be setup already
 - install a webserver with php support (Apache or nginx)
+- it needs the **php-yaml** module
 - install [srs](https://github.com/ossrs/srs) or something similar for previewing your stream (example for srs you found in the wiki)
 - we need some visudo entries:
   - www-data ALL = NOPASSWD: /bin/systemctl start srs, /bin/systemctl stop srs, /bin/systemctl status srs

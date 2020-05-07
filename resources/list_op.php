@@ -1,24 +1,16 @@
 <?php
 
-/* -----------------------------------------------------------------------------
-read values from ffplayout config file
-------------------------------------------------------------------------------*/
-
-// get config file
-function get_ini() {
-    return parse_ini_file("/etc/ffplayout/ffplayout.conf", TRUE, INI_SCANNER_RAW);
-}
+require_once('yamlReader.php');
+$yaml = get_yaml();
 
 // get start time
 if(!empty($_GET['list_start'])) {
-    $ini = get_ini();
-    echo $ini['PLAYLIST']['day_start'];
+    echo $yaml['playlist']['day_start'];
 }
 
 // get clips root directory
 if(!empty($_GET['clips_root'])) {
-    $ini = get_ini();
-    echo $ini['STORAGE']['path'];
+    echo $yaml['storage']['path'];
 }
 
 
@@ -44,8 +36,7 @@ $ext = implode('|', $except);
 if(!empty($_GET['json_path'])) {
     $json_date = $_GET['json_path'];
     $date_str = explode('-', $json_date);
-    $ini = get_ini();
-    $dir = $ini['PLAYLIST']['path'];
+    $dir = $yaml['playlist']['path'];
 
     $json_path = $dir . "/" . $date_str[0] . "/" . $date_str[1] . "/" . $json_date . ".json";
 
@@ -53,7 +44,7 @@ if(!empty($_GET['json_path'])) {
         $content = file_get_contents($json_path) or die("Error: Cannot create object");
         $json = json_decode($content, true);
 
-        list($hh, $mm, $ss) = explode(":", $ini['PLAYLIST']['day_start']);
+        list($hh, $mm, $ss) = explode(":", $yaml['playlist']['day_start']);
         list($l_hh, $l_mm, $l_ss) = explode(":", $json["length"]);
 
         $start = $hh * 3600 + $mm * 60 + $ss;
@@ -160,9 +151,7 @@ if(!empty($_POST['save'])) {
     $raw_arr = json_decode(urldecode($_POST['save']));
     $date = $_POST['date'];
     $date_str = explode('-', $date);
-    // get save path
-    $ini = get_ini();
-    $dir = $ini['PLAYLIST']['path'];
+    $dir = $yaml['playlist']['path'];
     $json_path = $dir . "/" . $date_str[0] . "/" . $date_str[1];
     $json_output = $json_path . "/" . $date . ".json";
 
