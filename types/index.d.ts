@@ -92,7 +92,7 @@ declare global {
         start: string
         duration: string
         shuffle: boolean
-        paths: string[]
+        paths: string[] | any[]
     }
 
     interface Template {

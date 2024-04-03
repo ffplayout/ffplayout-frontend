@@ -198,6 +198,8 @@ export const playlistOperations = () => {
                 if (forSave) {
                     item.out = length + dayStart - begin
                 }
+            } else {
+                delete item.class
             }
 
             if (forSave && begin >= length + dayStart) {

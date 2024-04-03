@@ -30,52 +30,59 @@
                         </ol>
                     </nav>
                 </div>
-                <ul class="list-group media-browser-scroll browser-div">
-                    <li
-                        class="list-group-item browser-item"
-                        v-for="folder in mediaStore.folderTree.folders"
-                        :key="folder.uid"
+                <div class="media-browser-scroll browser-div">
+                    <VirtualList
+                        v-model="mediaStore.folderTree.files"
+                        dataKey="uid"
+                        :group="groupFiles"
+                        handle=".drag"
+                        style="height: 100%"
+                        itemClass="listItem"
                     >
-                        <div class="row">
-                            <div class="col-1 browser-icons-col">
-                                <i class="bi-folder-fill browser-icons" />
-                            </div>
-                            <div class="col browser-item-text">
-                                <a
-                                    class="link-light"
-                                    href="#"
-                                    @click="getPath(`/${mediaStore.folderTree.source}/${folder.name}`)"
+                        <template #header>
+                            <ul class="list-group">
+                                <li
+                                    class="list-group-item browser-item"
+                                    v-for="folder in mediaStore.folderTree.folders"
+                                    :key="folder.uid"
                                 >
-                                    {{ folder.name }}
-                                </a>
-                            </div>
-                        </div>
-                    </li>
-                    <Sortable :list="mediaStore.folderTree.files" :options="browserSortOptions" item-key="name">
-                        <template #item="{ element, index }">
-                            <li
-                                :id="`file_${index}`"
-                                class="draggable list-group-item browser-item"
-                                :key="element.name"
-                            >
+                                    <div class="row">
+                                        <div class="col-1 browser-icons-col">
+                                            <i class="bi-folder-fill browser-icons" />
+                                        </div>
+                                        <div class="col browser-item-text">
+                                            <a
+                                                class="link-light"
+                                                href="#"
+                                                @click="getPath(`/${mediaStore.folderTree.source}/${folder.name}`)"
+                                            >
+                                                {{ folder.name }}
+                                            </a>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </template>
+                        <template v-slot:item="{ record, index, dataKey }">
+                            <div class="list-group-item browser-item">
                                 <div class="row">
                                     <div class="col-1 browser-icons-col">
                                         <i
-                                            v-if="mediaType(element.name) === 'audio'"
+                                            v-if="mediaType(record.name) === 'audio'"
                                             class="bi-music-note-beamed browser-icons"
                                         />
                                         <i
-                                            v-else-if="mediaType(element.name) === 'video'"
+                                            v-else-if="mediaType(record.name) === 'video'"
                                             class="bi-film browser-icons"
                                         />
                                         <i
-                                            v-else-if="mediaType(element.name) === 'image'"
+                                            v-else-if="mediaType(record.name) === 'image'"
                                             class="bi-file-earmark-image browser-icons"
                                         />
                                         <i v-else class="bi-file-binary browser-icons" />
                                     </div>
-                                    <div class="col browser-item-text grabbing">
-                                        {{ element.name }}
+                                    <div class="drag col browser-item-text grabbing">
+                                        {{ record.name }}
                                     </div>
                                     <div class="col-1 browser-play-col">
                                         <a
@@ -83,19 +90,19 @@
                                             class="btn-link"
                                             data-bs-toggle="modal"
                                             data-bs-target="#previewModal"
-                                            @click="setPreviewData(element.name)"
+                                            @click="setPreviewData(record.name)"
                                         >
                                             <i class="bi-play-fill" />
                                         </a>
                                     </div>
                                     <div class="col-1 browser-dur-col">
-                                        <span class="duration">{{ toMin(element.duration) }}</span>
+                                        <span class="duration">{{ toMin(record.duration) }}</span>
                                     </div>
                                 </div>
-                            </li>
+                            </div>
                         </template>
-                    </Sortable>
-                </ul>
+                    </VirtualList>
+                </div>
             </pane>
             <pane class="playlist-pane">
                 <div class="playlist-container">
@@ -118,56 +125,54 @@
                         <div class="spinner-border" role="status" />
                     </div>
                     <div id="scroll-container">
-                        <Sortable
-                            :list="playlistStore.playlist"
-                            item-key="uid"
+                        <VirtualList
+                            v-model="playlistStore.playlist"
+                            dataKey="uid"
+                            :group="groupPlaylist"
+                            handle=".drag"
                             class="list-group playlist-list-group"
-                            :style="`height: ${
-                                playlistStore.playlist ? playlistStore.playlist.length * 38 + 76 : 300
-                            }px`"
-                            tag="ul"
-                            :options="playlistSortOptions"
+                            itemClass="listItem"
+                            :wrapStyle="playlistStore.playlist.length === 0 ? { minHeight: '100px' } : {}"
                             @add="cloneClip"
-                            @end="moveItemInArray"
+                            @drop="moveItemInArray"
                         >
-                            <template #item="{ element, index }">
-                                <li
-                                    :id="`clip_${index}`"
-                                    class="draggable list-group-item playlist-item"
+                            <template v-slot:item="{ record, index, dataKey }">
+                                <div
+                                    class="list-group-item playlist-item"
                                     :class="
-                                        index === playlistStore.currentClipIndex && listDate === todayDate
-                                            ? 'active-playlist-clip'
-                                            : ''
+                                        (index === playlistStore.currentClipIndex &&
+                                            listDate === todayDate &&
+                                            'active-playlist-clip',
+                                        record.class && record.class)
                                     "
-                                    :key="element.uid"
                                 >
-                                    <div class="row playlist-row">
-                                        <div class="col-1 timecode">{{ secondsToTime(element.begin) }}</div>
-                                        <div class="col grabbing filename">{{ filename(element.source) }}</div>
+                                    <div class="row playlist-row p-0">
+                                        <div class="col-1 timecode">{{ secondsToTime(record.begin) }}</div>
+                                        <div class="col drag grabbing filename">{{ filename(record.source) }}</div>
                                         <div class="col-1 text-center playlist-input">
                                             <a
                                                 href="#"
                                                 class="btn-link"
                                                 data-bs-toggle="modal"
                                                 data-bs-target="#previewModal"
-                                                @click="setPreviewData(element.source)"
+                                                @click="setPreviewData(record.source)"
                                             >
                                                 <i class="bi-play-fill" />
                                             </a>
                                         </div>
-                                        <div class="col-1 timecode">{{ secToHMS(element.duration) }}</div>
-                                        <div class="col-1 timecode mobile-hidden">{{ secToHMS(element.in) }}</div>
-                                        <div class="col-1 timecode mobile-hidden">{{ secToHMS(element.out) }}</div>
+                                        <div class="col-1 timecode">{{ secToHMS(record.duration) }}</div>
+                                        <div class="col-1 timecode mobile-hidden">{{ secToHMS(record.in) }}</div>
+                                        <div class="col-1 timecode mobile-hidden">{{ secToHMS(record.out) }}</div>
                                         <div class="col-1 text-center playlist-input mobile-hidden">
                                             <input
                                                 class="form-check-input"
                                                 type="checkbox"
                                                 :checked="
-                                                    element.category && element.category === 'advertisement'
+                                                    record.category && record.category === 'advertisement'
                                                         ? true
                                                         : false
                                                 "
-                                                @change="setCategory($event, element)"
+                                                @change="setCategory($event, record)"
                                             />
                                         </div>
                                         <div class="col-1 text-center playlist-input">
@@ -187,9 +192,9 @@
                                             </a>
                                         </div>
                                     </div>
-                                </li>
+                                </div>
                             </template>
-                        </Sortable>
+                        </VirtualList>
                     </div>
                 </div>
             </pane>
@@ -455,10 +460,7 @@
                                     role="tab"
                                     aria-controls="v-pills-playout"
                                     aria-selected="false"
-                                    @click="
-                                        advancedGenerator = true,
-                                        resetCheckboxes()
-                                    "
+                                    @click=";(advancedGenerator = true), resetCheckboxes()"
                                 >
                                     Advanced
                                 </button>
@@ -590,24 +592,21 @@
                                         </div>
                                         <div class="row">
                                             <div class="col col-5 browser-col">
-                                                <Sortable
-                                                    :list="mediaStore.folderList.folders"
-                                                    :options="templateBrowserSortOptions"
-                                                    item-key="uid"
+                                                <VirtualList
+                                                    v-model="mediaStore.folderList.folders"
+                                                    dataKey="uid"
+                                                    :group="groupFolders"
+                                                    handle=".drag"
                                                     class="list-group media-browser-scroll browser-div"
-                                                    tag="ul"
+                                                    itemClass="listItem"
                                                 >
-                                                    <template #item="{ element, index }">
-                                                        <li
-                                                            :id="`adv_folder_${index}`"
-                                                            class="draggable list-group-item browser-item"
-                                                            :key="element.uid"
-                                                        >
+                                                    <template v-slot:item="{ record, index }">
+                                                        <div class="list-group-item browser-item">
                                                             <div class="row">
-                                                                <div class="col-1 browser-icons-col">
+                                                                <div class="drag col-1 browser-icons-col">
                                                                     <i class="bi-folder-fill browser-icons" />
                                                                 </div>
-                                                                <div class="col browser-item-text">
+                                                                <div class="drag col browser-item-text grabbing">
                                                                     <a
                                                                         class="link-light"
                                                                         href="#"
@@ -615,7 +614,7 @@
                                                                             ;[
                                                                                 (selectedFolders = []),
                                                                                 mediaStore.getTree(
-                                                                                    `/${mediaStore.folderList.source}/${element.name}`.replace(
+                                                                                    `/${mediaStore.folderList.source}/${record.name}`.replace(
                                                                                         /\/[/]+/g,
                                                                                         '/'
                                                                                     ),
@@ -624,13 +623,13 @@
                                                                             ]
                                                                         "
                                                                     >
-                                                                        {{ element.name }}
+                                                                        {{ record.name }}
                                                                     </a>
                                                                 </div>
                                                             </div>
-                                                        </li>
+                                                        </div>
                                                     </template>
-                                                </Sortable>
+                                                </VirtualList>
                                             </div>
                                             <div class="col template-col">
                                                 <ul class="list-group media-browser-scroll">
@@ -669,27 +668,24 @@
                                                             </label>
                                                         </div>
 
-                                                        <Sortable
-                                                            :list="item.paths"
-                                                            item-key="index"
+                                                        <VirtualList
+                                                            v-model="item.paths"
+                                                            dataKey="uid"
+                                                            :group="groupGen"
+                                                            handle=".drag"
                                                             class="list-group w-100 border"
-                                                            :style="`height: ${
-                                                                item.paths ? item.paths.length * 23 + 31 : 300
-                                                            }px`"
-                                                            tag="ul"
-                                                            :options="templateTargetSortOptions"
-                                                            @add="addFolderToTemplate($event, item)"
+                                                            style="min-height: 100px"
+                                                            :wrapStyle="
+                                                                item.paths.length === 0 ? { minHeight: '100px' } : {}
+                                                            "
+                                                            @add="cloneTemplateFolder"
                                                         >
-                                                            <template #item="{ element, index }">
-                                                                <li
-                                                                    :id="`path_${index}`"
-                                                                    class="draggable grabbing list-group-item py-0"
-                                                                    :key="index"
-                                                                >
-                                                                    {{ element.split(/[\\/]+/).pop() }}
-                                                                </li>
+                                                            <template v-slot:item="{ record, index }">
+                                                                <div class="drag grabbing list-group-item py-0">
+                                                                    {{ record.name }}
+                                                                </div>
                                                             </template>
-                                                        </Sortable>
+                                                        </VirtualList>
 
                                                         <div class="col d-flex justify-content-end">
                                                             <button
@@ -724,10 +720,7 @@
                             type="button"
                             class="btn btn-primary"
                             data-bs-dismiss="modal"
-                            @click="
-                                resetCheckboxes(),
-                                resetTemplate()
-                            "
+                            @click="resetCheckboxes(), resetTemplate()"
                         >
                             Cancel
                         </button>
@@ -783,24 +776,13 @@ const previewOpt = ref()
 const isVideo = ref(false)
 const selectedFolders = ref([] as string[])
 const generateFromAll = ref(false)
-const browserSortOptions = {
-    group: { name: 'playlist', pull: 'clone', put: false },
-    sort: false,
-}
-const playlistSortOptions = {
-    group: 'playlist',
-    animation: 100,
-    handle: '.grabbing',
-}
-const templateBrowserSortOptions = {
-    group: { name: 'folder', pull: 'clone', put: false },
-    sort: false,
-}
-const templateTargetSortOptions = {
-    group: 'folder',
-    animation: 100,
-    handle: '.grabbing',
-}
+
+const groupFiles = { name: 'group', put: false, pull: 'clone' }
+const groupPlaylist = { name: 'group', put: true, pull: true }
+
+const groupFolders = { name: 'generator', put: false, pull: 'clone' }
+const groupGen = { name: 'generator', put: true, pull: true }
+
 const newSource = ref({
     begin: 0,
     in: 0,
@@ -879,65 +861,34 @@ function onFileChange(evt: any) {
     textFile.value = files
 }
 
-function cloneClip(event: any) {
-    const o = event.oldIndex
-    const n = event.newIndex
-
-    event.item.remove()
-
+function cloneClip(params: any) {
     const storagePath = configStore.configPlayout.storage.path
-    const sourcePath = `${storagePath}/${mediaStore.folderTree.source}/${mediaStore.folderTree.files[o].name}`.replace(
-        /\/[/]+/g,
-        '/'
-    )
+    const sourcePath = `${storagePath}/${mediaStore.folderTree.source}/${params.item.name}`.replace(/\/[/]+/g, '/')
 
-    playlistStore.playlist.splice(n, 0, {
-        uid: genUID(),
-        begin: 0,
-        source: sourcePath,
-        in: 0,
-        out: mediaStore.folderTree.files[o].duration,
-        duration: mediaStore.folderTree.files[o].duration,
-    })
-
-    playlistStore.playlist = processPlaylist(
-        configStore.startInSec,
-        configStore.playlistLength,
-        playlistStore.playlist,
-        false
-    )
+    params.item.begin = 0
+    params.item.in = 0
+    params.item.out = params.item.duration
+    params.item.source = sourcePath
 }
 
-function addFolderToTemplate(event: any, item: TemplateItem) {
-    const o = event.oldIndex
-    const n = event.newIndex
+function moveItemInArray(params: any) {
+    playlistStore.playlist = params.list
 
-    event.item.remove()
+    playlistStore.playlist = processPlaylist(configStore.startInSec, configStore.playlistLength, params.list, false)
+}
 
+function cloneTemplateFolder(params: any) {
     const storagePath = configStore.configPlayout.storage.path
     const navPath = mediaStore.folderCrumbs[mediaStore.folderCrumbs.length - 1].path
-    const sourcePath = `${storagePath}/${navPath}/${mediaStore.folderList.folders[o].name}`.replace(/\/[/]+/g, '/')
+    const sourcePath = `${storagePath}/${navPath}/${params.item.name}`.replace(/\/[/]+/g, '/')
 
-    if (!item.paths.includes(sourcePath)) {
-        item.paths.splice(n, 0, sourcePath)
-    }
+    params.item.source = sourcePath
 }
 
 function removeTemplate(item: TemplateItem) {
     const index = template.value.sources.indexOf(item)
 
     template.value.sources.splice(index, 1)
-}
-
-function moveItemInArray(event: any) {
-    playlistStore.playlist.splice(event.newIndex, 0, playlistStore.playlist.splice(event.oldIndex, 1)[0])
-
-    playlistStore.playlist = processPlaylist(
-        configStore.startInSec,
-        configStore.playlistLength,
-        playlistStore.playlist,
-        false
-    )
 }
 
 function setPreviewData(path: string) {
@@ -1133,6 +1084,10 @@ async function generatePlaylist() {
     }
 
     if (advancedGenerator.value) {
+        template.value.sources.forEach((item) => {
+            item.paths = item.paths.map((p) => p.source)
+        })
+
         if (body) {
             body.template = template.value
         } else {
@@ -1329,11 +1284,17 @@ function addTemplate() {
     height: 100%;
 }
 
+.browser-item {
+    background-color: var(--bs-list-group-bg);
+}
+
 .playlist-item {
+    background-color: var(--bs-list-group-bg);
     height: 38px;
 }
 
-.playlist-item:nth-of-type(odd) {
+.listItem:nth-of-type(odd) .playlist-item,
+.listItem:nth-of-type(odd) .browser-item {
     background-color: #3b424a;
 }
 

@@ -66,6 +66,7 @@ export const useMedia = defineStore('media', {
                     } else {
                         this.currentPath = path
                         this.crumbs = crumbs
+                        data.files = data.files.map((i: any) => ({uid: genUID(), ...i}))
                         data.folders = data.folders.map((i: any) => ({uid: genUID(), name: i}))
                         this.folderTree = data
                     }
