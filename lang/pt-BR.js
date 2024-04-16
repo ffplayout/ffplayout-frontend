@@ -7,7 +7,7 @@ export default {
     button: {
         login: 'Login',
         home: 'Página inicial',
-        player: 'Agendador',
+        player: 'Playout',
         media: 'Arquivos',
         message: 'Mensagem',
         logging: 'Registro',
