@@ -36,6 +36,7 @@
                         dataKey="uid"
                         :group="groupFiles"
                         handle=".drag"
+                        :sortable="false"
                         style="height: 100%"
                         itemClass="listItem"
                     >
