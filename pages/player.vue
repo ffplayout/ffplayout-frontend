@@ -873,8 +873,6 @@ function cloneClip(params: any) {
 }
 
 function moveItemInArray(params: any) {
-    playlistStore.playlist = params.list
-
     playlistStore.playlist = processPlaylist(configStore.startInSec, configStore.playlistLength, params.list, false)
 }
 
