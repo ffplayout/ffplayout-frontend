@@ -134,8 +134,8 @@
                             class="list-group playlist-list-group"
                             itemClass="listItem"
                             :wrapStyle="playlistStore.playlist.length === 0 ? { minHeight: '100px' } : {}"
-                            @add="cloneClip"
-                            @drop="moveItemInArray"
+                            @add="addClip"
+                            @drop="dropClip"
                         >
                             <template v-slot:item="{ record, index, dataKey }">
                                 <div
@@ -862,18 +862,19 @@ function onFileChange(evt: any) {
     textFile.value = files
 }
 
-function cloneClip(params: any) {
+function addClip(params: any) {
     const storagePath = configStore.configPlayout.storage.path
     const sourcePath = `${storagePath}/${mediaStore.folderTree.source}/${params.item.name}`.replace(/\/[/]+/g, '/')
 
+    params.item.uid = genUID()
     params.item.begin = 0
     params.item.in = 0
     params.item.out = params.item.duration
     params.item.source = sourcePath
 }
 
-function moveItemInArray(params: any) {
-    playlistStore.playlist = processPlaylist(configStore.startInSec, configStore.playlistLength, params.list, false)
+function dropClip(params: any) {
+    playlistStore.playlist = processPlaylist(configStore.startInSec, configStore.playlistLength, $_.cloneDeep(params.list), false)
 }
 
 function cloneTemplateFolder(params: any) {
@@ -1335,6 +1336,10 @@ function addTemplate() {
 }
 </style>
 <style>
+#scroll-container .ghostItem div {
+    background-color: red !important;
+}
+
 @media (max-width: 575px) {
     .mobile-hidden {
         display: none;
