@@ -27,7 +27,7 @@ export default {
         cpu: 'Processador',
         cores: 'Núcleos',
         load: 'Carregamento',
-        memory: 'Memoria',
+        memory: 'Memória',
         swap: 'Memória virtual',
         total: 'Total',
         usage: 'Uso',
