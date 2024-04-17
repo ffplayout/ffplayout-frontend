@@ -26,9 +26,9 @@ export default {
     system: {
         cpu: 'Processador',
         cores: 'Núcleos',
-        load: 'Carregamento',
+        load: 'Processos',
         memory: 'Memória',
-        swap: 'Memória virtual',
+        swap: 'Memória swap',
         total: 'Total',
         usage: 'Uso',
         network: 'Rede',
