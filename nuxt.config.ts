@@ -95,7 +95,7 @@ export default defineNuxtConfig({
             media: {
                 de: '/medien',
                 en: '/media',
-                pt: '/arquivos',
+                pt: '/media',
             },
             message: {
                 de: '/nachrichten',
