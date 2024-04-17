@@ -52,7 +52,7 @@ export default {
     player: {
         start: 'Horário',
         file: 'Mídia',
-        play: 'Reproduzir',
+        play: 'Visualizar',
         duration: 'Duração',
         in: 'Entrada',
         out: 'Saida',
