@@ -128,7 +128,7 @@ export default {
         errorChannelDelete: 'O primeiro canal não pode ser excluído!',
         deleteChannelSuccess: 'Excluir configuração da GUI com sucesso!',
         deleteChannelFailed: 'Falha ao excluir configuração da GUI!',
-        playoutConf: 'Configuração do playout',
+        playoutConf: 'Configuração do ffplayout',
         general: 'Geral',
         rpcServer: 'RPC Server',
         mail: 'Email',
@@ -139,16 +139,16 @@ export default {
         storage: 'Armazenamento',
         text: 'Texto',
         task: 'Tarefa',
-        out: 'Saida',
+        out: 'Transmissão',
         placeholderPass: 'Senha',
         help: 'Ajuda',
         generalText: `Às vezes pode acontecer que um arquivo esteja corrompido, mas ainda possa ser reproduzido, o que pode causar um erro de streaming em todos os arquivos seguintes. A única maneira de corrigir isso é parar e reiniciar o ffplayout. Aqui só dizemos quando parar, o processo de início é com você. A melhor maneira é um serviço systemd no Linux.
         'stop_threshold' irá parar o ffplayout se for assíncrono no tempo acima deste valor. Um número menor que 3 pode causar erros inesperados.`,
-        rpcText: 'Execute um servidor JSON RPC para obter informações sobre o que está sendo reproduzido e para algumas funções de controle.',
+        rpcText: 'Execute um servidor JSON RPC para obter informações sobre o que está sendo reproduzido e para algumas funções de controle. Ao desativar esse serviço, o front end não responderá com as informações de mídia, entre outras funções.',
         mailText: `Enviar mensagens de erro para o endereço de e-mail, como lista de reprodução ausente; formato JSON inválido; faltando caminho do clipe. Deixe o destinatário em branco se não precisar dele. 'mail_level' pode ser INFO, WARNING ou ERROR. 'interval' eo tempo em segundos até que um novo e-mail seja enviado.`,
         logText: `Se 'log_to_file' estiver acionado, registre no arquivo; se for desativado, registre no console. 'backup_count' indica por quanto tempo os arquivos de registro serão salvos em dias. 'local_time' acionado definirá os carimbos de data e hora do log para UTC. Caminho para /var/log/ somente se você estiver executando como um daemon.
-        'nível' pode ser DEBUG, INFO, WARNING, ERROR. 'ffmpeg_level' pode ser INFO, AVISO, ERRO. 'detect_silence' registra uma mensagem de erro se a linha de áudio ficar em silêncio por 15 segundos durante o processo de validação.`,
-        processingText: `Processamento padrão para todos os clipes para torná-los únicos. O modo pode ser Playlist ou Pasta. 'aspecto' deve ser um número flutuante. 'logotipo' só é usado se o caminho existir.
+        'nível' pode ser DEBUG, INFO, WARNING, ERROR. 'ffmpeg_level' pode ser INFO, AVISO, ERRO. 'detect_silence' registra uma mensagem de erro se a linha de áudio ficar em silêncio por 15 segundos durante o processo de validação. 'ignore_lines' Ignorar erros de registros`,
+        processingText: `Processamento padrão para todos os clipes para torná-los únicos. O modo pode ser Playlist ou Folder. 'aspecto' deve ser um número flutuante. 'logotipo' só é usado se o caminho existir.
         'logo_scale' dimensiona o logotipo para o tamanho desejado, deixe em branco se nenhum dimensionamento for necessário, o formato é 'largura:altura', por exemplo '100:-1' para dimensionamento proporcional. Com 'logo_opacity' você pode tornar o logotipo transparente.
         Com 'audio_tracks' é possível configurar quantas faixas de áudio devem ser processadas. 'audio_channels' pode ser usado se o áudio tiver mais canais do que apenas estéreo. Com 'logo_position' no formato 'x:y' você define a posição do logotipo. Com 'custom_filter' é possível aplicar filtros adicionais. As saídas do filtro devem terminar com [c_v_out] para filtros de vídeo e [c_a_out] para filtros de áudio.`,
         ingestText: `Execute um servidor para um fluxo de ingestão. Este fluxo substituirá o streaming normal até que seja concluído. Existe apenas um mecanismo de autenticação muito simples para verificar se o nome do stream está correto. 'custom_filter' pode ser usado da mesma forma que na seção de processo.`,
