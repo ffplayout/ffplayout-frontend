@@ -100,7 +100,7 @@ export default defineNuxtConfig({
             message: {
                 de: '/nachrichten',
                 en: '/message',
-                pt: '/mensagem
+                pt: '/mensagem',
             },
             logging: {
                 de: '/protokollierung',
