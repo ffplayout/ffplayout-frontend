@@ -51,6 +51,7 @@ declare global {
         date?: string
         uid: string
         begin: number
+        title?: string | null
         source: string
         duration: number
         in: number

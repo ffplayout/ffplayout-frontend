@@ -80,7 +80,7 @@
                     >
                         <td class="ps-4 py-2 text-left">{{ secondsToTime(element.begin) }}</td>
                         <td class="py-2 text-left truncate" :class="{ 'grabbing cursor-grab': width > 768 }">
-                            {{ filename(element.source) }}
+                            {{ element.title || filename(element.source) }}
                         </td>
                         <td class="py-2 text-center hover:text-base-content/70">
                             <button @click="preview(element.source)">
@@ -219,6 +219,7 @@ function addClip(event: any) {
     playlistStore.playlist.splice(n, 0, {
         uid,
         begin: 0,
+        title: mediaStore.folderTree.files[o].name,
         source: sourcePath,
         in: 0,
         out: mediaStore.folderTree.files[o].duration,
