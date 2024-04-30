@@ -1,6 +1,8 @@
 export default {
     ok: 'Ok',
     cancel: 'Cancelar',
+    socketConnected: 'Event stream conectado',
+    socketDisconnected: 'Event stream desconectado',
     alert: {
         wrongLogin: 'Dados incorretos!',
     },
@@ -83,6 +85,7 @@ export default {
         advanced: 'Avançado',
         sorted: 'Ordenado',
         shuffle: 'Aleatório',
+        shift: 'Diferença horária',
         all: 'Todos',
         addBlock: 'Adicionar bloco de tempo',
     },
@@ -127,6 +130,9 @@ export default {
         borderWidth: 'Largura da borda',
         send: 'Enviar',
         name: 'Nome',
+    },
+    log: {
+        download: 'Baixar arquivo de registro',
     },
     config: {
         channel: 'Canal',

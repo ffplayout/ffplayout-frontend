@@ -23,7 +23,8 @@ export const usePlaylist = defineStore('playlist', {
         currentClipIn: 0,
         currentClipOut: 0,
         ingestRuns: false,
-        remainingSec: 0,
+        elapsedSec: 0,
+        shift: 0,
         playoutIsRunning: false,
     }),
 
@@ -75,39 +76,19 @@ export const usePlaylist = defineStore('playlist', {
                 })
         },
 
-        async playoutStat() {
-            const authStore = useAuth()
-            const configStore = useConfig()
-            const channel = configStore.configGui[configStore.configID].id
+        setStatus(item: PlayoutStatus) {
+            this.playoutIsRunning = true
+            this.currentClip = item.media.source
+            this.currentClipIn = item.media.in
+            this.currentClipOut = item.media.out
+            this.currentClipDuration = item.media.duration
+            this.currentClipTitle = item.media.title
+            this.currentClipIndex = item.index
+            this.elapsedSec = item.elapsed
+            this.ingestRuns = item.ingest
+            this.shift = item.shift
 
-            await fetch(`/api/control/${channel}/media/current`, {
-                method: 'GET',
-                headers: authStore.authHeader,
-            })
-                .then((response) => {
-                    if (response.status === 503) {
-                        this.playoutIsRunning = false
-                    }
-
-                    return response.json()
-                })
-                .then((data) => {
-                    if (data && data.played_sec) {
-                        this.playoutIsRunning = true
-                        this.currentClip = data.current_media.source
-                        this.currentClipIndex = data.index
-                        this.currentClipTitle = data.current_media.title
-                        this.currentClipStart = data.start_sec
-                        this.currentClipDuration = data.current_media.duration
-                        this.currentClipIn = data.current_media.seek
-                        this.currentClipOut = data.current_media.out
-                        this.remainingSec = data.remaining_sec
-                        this.ingestRuns = data.ingest_runs
-                    }
-                })
-                .catch(() => {
-                    this.playoutIsRunning = false
-                })
+            this.progressValue = (this.elapsedSec * 100) / this.currentClipOut
         },
     },
 })

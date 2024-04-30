@@ -17,6 +17,10 @@ declare global {
         }
     }
 
+    interface DataAuth {
+        uuid: string
+    }
+
     interface GuiConfig {
         id: number
         config_path: string
@@ -115,5 +119,14 @@ declare global {
         storage?: { path: string; total: number; used: number }
         swap: { total: number; used: number; free: number }
         system: { name?: string; kernel?: string; version?: string; ffp_version?: string }
+    }
+
+    interface PlayoutStatus {
+        media: PlaylistItem
+        index: number
+        ingest: boolean
+        mode: string
+        elapsed: number
+        shift: number
     }
 }

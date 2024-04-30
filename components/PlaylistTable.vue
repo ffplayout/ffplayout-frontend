@@ -1,5 +1,9 @@
 <template>
-    <div id="playlist-container" class="relative w-full h-full !bg-base-300 rounded-e overflow-auto">
+    <div
+        id="playlist-container"
+        ref="playlistContainer"
+        class="relative w-full h-full !bg-base-300 rounded-e overflow-auto"
+    >
         <div v-if="playlistStore.isLoading" class="w-full h-full absolute z-10 flex justify-center bg-base-100/70">
             <span class="loading loading-spinner loading-lg" />
         </div>
@@ -74,7 +78,7 @@
                             '!bg-lime-500/30':
                                 playlistStore.playoutIsRunning &&
                                 listDate === todayDate &&
-                                index === playlistStore.currentClipIndex,
+                                index === currentClipIndex,
                             '!bg-amber-600/40': element.overtime,
                         }"
                     >
@@ -130,9 +134,10 @@ const playlistStore = usePlaylist()
 const { secToHMS, filename, secondsToTime } = stringFormatter()
 const { processPlaylist, genUID } = playlistOperations()
 
+const playlistContainer = ref()
 const sortContainer = ref()
 const todayDate = ref($dayjs().utcOffset(configStore.utcOffset).format('YYYY-MM-DD'))
-const { listDate } = storeToRefs(usePlaylist())
+const { currentClipIndex, listDate } = storeToRefs(usePlaylist())
 
 const playlistSortOptions = {
     group: 'playlist',
@@ -140,13 +145,7 @@ const playlistSortOptions = {
     handle: '.grabbing',
 }
 
-const props = defineProps({
-    getPlaylist: {
-        type: Function,
-        default() {
-            return ''
-        },
-    },
+defineProps({
     editItem: {
         type: Function,
         default() {
@@ -162,23 +161,59 @@ const props = defineProps({
 })
 
 onMounted(() => {
-    props.getPlaylist()
+    getPlaylist()
 })
 
 watch([listDate], () => {
-    props.getPlaylist()
+    getPlaylist()
 })
 
 defineExpose({
     classSwitcher,
+    getPlaylist,
 })
 
+function scrollTo(index: number) {
+    const child = document.getElementById(`clip-${index}`)
+    const parent = document.getElementById('playlist-container')
+
+    if (child && parent) {
+        const topPos = child.offsetTop
+        parent.scrollTop = topPos - 50
+    }
+}
+
 function classSwitcher() {
-    if (playlistStore.playlist.length === 0 && sortContainer.value) {
+    if (playlistStore.playlist.length === 0) {
         sortContainer.value.sortable.el.classList.add('is-empty')
     } else {
+        const lastItem = playlistStore.playlist[playlistStore.playlist.length - 1]
+
+        if (
+            configStore.playout.playlist.startInSec + configStore.playout.playlist.lengthInSec >
+            lastItem.begin + lastItem.out - lastItem.in
+        ) {
+            sortContainer.value.sortable.el.classList.add('add-space')
+        } else {
+            sortContainer.value.sortable.el.classList.remove('add-space')
+        }
         sortContainer.value.sortable.el.classList.remove('is-empty')
     }
+}
+
+async function getPlaylist() {
+    playlistStore.isLoading = true
+    await playlistStore.getPlaylist(listDate.value)
+    playlistStore.isLoading = false
+
+    if (listDate.value === todayDate.value) {
+        await until(currentClipIndex).toMatch(v => v > 0, { timeout: 1500 })
+        scrollTo(currentClipIndex.value)
+    } else {
+        scrollTo(0)
+    }
+
+    classSwitcher()
 }
 
 function setCategory(event: any, item: PlaylistItem) {
@@ -226,13 +261,15 @@ function addClip(event: any) {
         duration: mediaStore.folderTree.files[o].duration,
     })
 
-    classSwitcher()
     processPlaylist(listDate.value, playlistStore.playlist, false)
+    classSwitcher()
 
     nextTick(() => {
         const newNode = document.getElementById(`clip-${n}`)
         addBG(newNode)
         removeBG(newNode)
+
+        playlistContainer.value.scroll({ top: playlistContainer.value.scrollHeight, behavior: 'smooth' })
     })
 }
 
@@ -261,6 +298,14 @@ function deletePlaylistItem(index: number) {
     position: absolute;
     justify-content: center;
     align-items: center;
+}
+
+#sort-container.add-space:after {
+    content: ' ';
+    width: 100%;
+    height: 37px;
+    display: flex;
+    position: absolute;
 }
 
 /*
