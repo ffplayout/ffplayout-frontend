@@ -30,7 +30,7 @@
     "video.js": "^8.10.0",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0",
-    "vue-virtual-draglist": "^3.2.3"
+    "vue-virtual-draglist": "^3.2.4"
   },
   "devDependencies": {
     "@nuxtjs/eslint-config": "^12.0.0",
