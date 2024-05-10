@@ -70,7 +70,7 @@ export default {
         reset: 'Сбросить плейлист',
         save: 'Сохранить плейлист',
         deletePlaylist: 'Удалить плейлист',
-        unsavedProgram: 'There is a program that is not saved!',
+        unsavedProgram: 'Этот плейлист не сохранен!',
         copyTo: 'Скопировать текущую программу за',
         addEdit: 'Add/Edit Source',
         audio: 'Звук',
